@@ -7,6 +7,9 @@ vim, wget, openssh-server, git, python3, libGL.so.1) are already installed."
 
 RUN rm /bin/sh && ln -s /bin/bash /bin/sh
 ARG DEBIAN_FRONTEND noninteractive
+ARG USER="docker"
+ARG PASSWD="docker"
+ARG USER_HOME="/home/"$USER
 EXPOSE 22
 
 # copy files
@@ -43,13 +46,12 @@ RUN apt-get update --fix-missing && apt-get upgrade -y &&  \
 
 # add new sudo user named docker with 'docker' as its password
 RUN addgroup --gid 1111 docker && \
-    adduser --uid 1111 --ingroup docker --home /home/docker --shell /bin/bash --disabled-password --gecos "" docker && \
-    adduser docker sudo && \
-    echo 'docker:docker' | chpasswd
+    adduser --uid 1111 --ingroup docker --home $USER_HOME --shell /bin/bash --disabled-password --gecos "" $USER && \
+    adduser $USER sudo && \
+    echo $USER:$PASSWD | chpasswd
 
 # fixuid setup
-RUN USER=docker && \
-    GROUP=docker && \
+RUN GROUP=docker && \
     mv /tmp/fixuid-*-linux-amd64.tar.gz /tmp/fixuid.tar.gz && \
     tar -C /usr/local/bin -xzf /tmp/fixuid.tar.gz && \
     chown root:root /usr/local/bin/fixuid && \
@@ -62,16 +64,16 @@ RUN wget -q -P /tmp https://mirrors.tuna.tsinghua.edu.cn/anaconda/archive/Anacon
     mv /tmp/Anaconda3-*.sh /tmp/anaconda.sh && \
     /bin/bash /tmp/anaconda.sh -b -p /usr/local/anaconda3 && \
     groupadd anaconda && \
-    usermod -a -G anaconda docker && \
+    usermod -a -G anaconda $USER && \
     chgrp -R anaconda /usr/local/anaconda3 && \
     chmod 777 -R /usr/local/anaconda3 && chmod g+s /usr/local/anaconda3 && chmod g+s `find /usr/local/anaconda3/ -type d`
 ENV PATH /usr/local/anaconda3/bin:$PATH
-RUN mkdir /home/docker/.pip && \
+RUN mkdir $USER_HOME/.pip && \
     echo -e "[global]\n"\
 "index-url = https://pypi.tuna.tsinghua.edu.cn/simple\n"\
 "\n"\
 "[install]\n"\
-"trusted-host = pypi.tuna.tsinghua.edu.cn" > /home/docker/.pip/pip.conf && \
+"trusted-host = pypi.tuna.tsinghua.edu.cn" > $USER_HOME/.pip/pip.conf && \
     echo -e "channels:\n"\
 "  - defaults\n"\
 "show_channel_urls: true\n"\
@@ -86,7 +88,7 @@ RUN mkdir /home/docker/.pip && \
 "  bioconda: https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud\n"\
 "  menpo: https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud\n"\
 "  pytorch: https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud\n"\
-"  simpleitk: https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud" > /home/docker/.condarc && \
+"  simpleitk: https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud" > $USER_HOME/.condarc && \
     echo -e "\n__conda_setup=\"\$('/usr/local/anaconda3/bin/conda' 'shell.bash' 'hook' 2> /dev/null)\"\n"\
 "if [ \$? -eq 0 ]; then\n"\
 "    eval \"\$__conda_setup\"\n"\
@@ -97,21 +99,21 @@ RUN mkdir /home/docker/.pip && \
 "        export PATH=\"/usr/local/anaconda3/bin:\$PATH\"\n"\
 "    fi\n"\
 "fi\n"\
-"unset __conda_setup\n" >> /home/docker/.bashrc && \
-    source /home/docker/.bashrc && source /etc/profile && \
-    chown -R docker:docker /home/docker/
+"unset __conda_setup\n" >> $USER_HOME/.bashrc && \
+    source $USER_HOME/.bashrc && source /etc/profile && \
+    chown -R $USER:docker $USER_HOME/
 
 # create entrypoint start.sh
 RUN echo -e '#!/bin/bash\n'\
 '# UID/GID map to unknown user/group\n'\
 'eval $( fixuid )\n'\
 '# start ssh service\n'\
-'echo "docker" | sudo -S service ssh start\n'\
+'echo '$PASSWD' | sudo -S service ssh start\n'\
 '/bin/bash' > /home/start.sh && \
     chmod 777 /home/start.sh
 
 # clean up
 RUN	rm -rf /tmp/* /var/cache/* /usr/share/doc/* /usr/share/man/* /var/lib/apt/lists/*
 
-USER docker:docker
+USER $USER:docker
 ENTRYPOINT /home/start.sh

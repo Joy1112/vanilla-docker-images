@@ -14,8 +14,8 @@ LABEL author = 'Joy' \
 
 # what is ridiculous is that u must call `source deactivate` before other `conda` commands otherwise it will remind u to call `conda init <shell_name>`.
 RUN conda create -n $ENV_NAME python=$PYTHON_VERSION && \
-    echo -e "\nconda activate "$ENV_NAME >> /home/docker/.bashrc && \
-    source /home/docker/.bashrc && source /etc/profile && \
+    echo -e "\nconda activate "$ENV_NAME >> $HOME/.bashrc && \
+    source $HOME/.bashrc && source /etc/profile && \
     source deactivate && conda activate $ENV_NAME && \
     conda install pytorch==$TORCH_VERSION torchvision==$TORCHVISITON_VERSION torchaudio==$TORCHAUDIO_VERSION cudatoolkit=$CUDATOOLKIT_VERSION -c pytorch -y && \
     pip install --no-cache-dir tensorboard

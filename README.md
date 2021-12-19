@@ -18,6 +18,12 @@ docker build -t <image_name>:<tag> ubuntu-anaconda
 
 # etc.
 docker build -t ubuntu18.04-anaconda3/cuda-11.0:latest ubuntu-anaconda
+
+# or u can specify the username & password if u want
+docker build -t ubuntu18.04-anaconda3/cuda-11.0:latest \
+--build-arg USER="dev" \
+--build-arg PASSWD="123456" \
+ubuntu-anaconda
 ```
 
 **Softwares have benn installed**:
