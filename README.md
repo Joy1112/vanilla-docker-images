@@ -61,5 +61,9 @@ When u call `run` command, it will automatically run the script `/home/start.sh`
 docker run -it -u $(id -u):$(id -g) <image_name>
 
 # full command
-docker run --name <container_name> -it -u $(id -u):$(id -g) -p <new_port>:22 --gpus all -v <path_to_home>/.ssh:/root/.ssh:ro <image_name>
+docker run --name <container_name> -it -u $(id -u):$(id -g) -p <new_port>:22 --gpus all -v <path_to_home>/.ssh:/home/docker/.ssh:ro <image_name>
 ```
+
+The password for the user `docker` is also `docker`.
+
+And user `docker` have been added into the root group which means you can install any softwares with `sudo` as the command-prefix.
