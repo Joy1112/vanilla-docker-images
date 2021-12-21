@@ -106,7 +106,7 @@ RUN mkdir $USER_HOME/.pip && \
 # create entrypoint start.sh
 RUN echo -e '#!/bin/bash\n'\
 '# UID/GID map to unknown user/group\n'\
-'eval $( fixuid )\n'\
+'eval $( fixuid -q)\n'\
 '# start ssh service\n'\
 'echo '$PASSWD' | sudo -S service ssh start\n'\
 '/bin/bash' > /home/start.sh && \
