@@ -26,7 +26,7 @@ docker build -t ubuntu18.04-anaconda3/cuda-11.0:latest \
 ubuntu-anaconda
 ```
 
-**Softwares have benn installed**:
+**Softwares have been installed**:
 * vim
 * wget
 * curl
@@ -73,3 +73,8 @@ docker run --name <container_name> -it -u $(id -u):$(id -g) -p <new_port>:22 --g
 The password for the user `docker` is also `docker`.
 
 And user `docker` have been added into the root group which means you can install any softwares with `sudo` as the command-prefix.
+
+
+## References
+* https://github.com/boxboat/fixuid
+* https://github.com/hangvane/cuda-conda-desktop
