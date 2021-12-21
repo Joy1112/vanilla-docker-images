@@ -32,6 +32,7 @@ ubuntu-anaconda
 * curl
 * openssh-server
 * git
+* tmux
 * Anaconda3 (The sources of pip & conda have been all changed to [Tsinghua Open Source](https://mirrors.tuna.tsinghua.edu.cn/))
 * libgl1-mesa-glx (libGL.so.1)
 * python3 (/usr/local/bin/python -> /usr/local/bin/python3.6)

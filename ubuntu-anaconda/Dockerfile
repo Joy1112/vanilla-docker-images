@@ -37,7 +37,7 @@ RUN apt-get update --fix-missing && \
 # install basic softwares
 RUN apt-get update --fix-missing && apt-get upgrade -y &&  \
     apt-get install -y --no-install-recommends sudo vim iproute2 wget curl iputils-ping net-tools iptables \
-        graphviz openssh-server command-not-found git tzdata libgl1-mesa-glx python3 && \
+        graphviz openssh-server command-not-found git tzdata libgl1-mesa-glx tmux python3 && \
     ln -s /usr/bin/python3.6 /usr/bin/python && \
     sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/g' /etc/ssh/sshd_config && \
     echo 'sshd:ALL' >> /etc/hosts.allow && \
@@ -57,7 +57,7 @@ RUN GROUP=docker && \
     chown root:root /usr/local/bin/fixuid && \
     chmod 4755 /usr/local/bin/fixuid && \
     mkdir -p /etc/fixuid && \
-    printf "user: $USER\ngroup: $GROUP\n" > /etc/fixuid/config.yml
+    printf "user: $USER\ngroup: $GROUP\npaths:\n  - $USER_HOME\n  - $USER_HOME/.ssh" > /etc/fixuid/config.yml
 
 # install anaconda3 & change conda/pip sources
 RUN wget -q -P /tmp https://mirrors.tuna.tsinghua.edu.cn/anaconda/archive/Anaconda3-2021.11-Linux-x86_64.sh && \
