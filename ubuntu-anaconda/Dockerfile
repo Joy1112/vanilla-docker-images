@@ -6,7 +6,7 @@ LABEL author = 'Joy' \
 vim, wget, openssh-server, git, python3, libGL.so.1) are already installed."
 
 RUN rm /bin/sh && ln -s /bin/bash /bin/sh
-ARG DEBIAN_FRONTEND noninteractive
+ARG DEBIAN_FRONTEND=noninteractive
 ARG USER="docker"
 ARG PASSWD="docker"
 ARG USER_HOME="/home/"$USER
@@ -14,9 +14,6 @@ EXPOSE 22
 
 # copy files
 COPY fixuid-*-linux-amd64.tar.gz /tmp/
-
-# change time zone
-RUN ln -fs /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && echo 'Asia/Shanghai' > /etc/timezone
 
 # install ca-certificates & update sources.list
 RUN apt-get update --fix-missing && \
@@ -37,11 +34,13 @@ RUN apt-get update --fix-missing && \
 # install basic softwares
 RUN apt-get update --fix-missing && apt-get upgrade -y &&  \
     apt-get install -y --no-install-recommends sudo vim iproute2 wget curl iputils-ping net-tools iptables \
-        graphviz openssh-server command-not-found git tzdata libgl1-mesa-glx tmux python3 && \
+        graphviz openssh-server command-not-found git tzdata libgl1-mesa-glx tmux htop python3 && \
     ln -s /usr/bin/python3.6 /usr/bin/python && \
     sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/g' /etc/ssh/sshd_config && \
+    sed -i 's/#PubkeyAuthentication yes/PubkeyAuthentication yes/g' /etc/ssh/sshd_config && \
+    sed -i 's/#PasswordAuthentication yes/PasswordAuthentication no/g' /etc/ssh/sshd_config && \
     echo 'sshd:ALL' >> /etc/hosts.allow && \
-    dpkg-reconfigure tzdata && \
+    ln -fs /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && echo 'Asia/Shanghai' > /etc/timezone && dpkg-reconfigure tzdata && \
     apt-get autoclean && apt-get autoremove
 
 # add new sudo user named docker with 'docker' as its password
@@ -89,6 +88,8 @@ RUN mkdir $USER_HOME/.pip && \
 "  menpo: https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud\n"\
 "  pytorch: https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud\n"\
 "  simpleitk: https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud" > $USER_HOME/.condarc && \
+    echo -e "\nexport PATH=\$PATH:/usr/local/cuda/bin\n"\
+"export LD_LIBRARY_PATH=/usr/local/cuda/lib64\n" >> $USER_HOME/.bashrc && \
     echo -e "\n__conda_setup=\"\$('/usr/local/anaconda3/bin/conda' 'shell.bash' 'hook' 2> /dev/null)\"\n"\
 "if [ \$? -eq 0 ]; then\n"\
 "    eval \"\$__conda_setup\"\n"\
