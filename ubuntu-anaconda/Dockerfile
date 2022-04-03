@@ -1,5 +1,6 @@
 # basic image
-FROM nvidia/cuda:11.0.3-cudnn8-devel-ubuntu18.04
+ARG DOCKER_BASE="nvidia/cuda:11.0.3-cudnn8-devel-ubuntu18.04"
+FROM $DOCKER_BASE
 
 LABEL author = 'Joy' \
       description="This image is built from cuda:11.0.3-cudnn8-devel-ubuntu18.04, and basic required softwares (including Anaconda3, \
@@ -34,7 +35,7 @@ RUN apt-get update --fix-missing && \
 # install basic softwares
 RUN apt-get update --fix-missing && apt-get upgrade -y &&  \
     apt-get install -y --no-install-recommends sudo vim iproute2 wget curl iputils-ping net-tools iptables \
-        graphviz openssh-server command-not-found git tzdata libgl1-mesa-glx tmux htop python3 && \
+        graphviz openssh-server git tzdata libgl1-mesa-glx tmux htop python3 && \
     ln -s /usr/bin/python3.6 /usr/bin/python && \
     sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/g' /etc/ssh/sshd_config && \
     sed -i 's/#PubkeyAuthentication yes/PubkeyAuthentication yes/g' /etc/ssh/sshd_config && \
@@ -118,3 +119,4 @@ RUN	rm -rf /tmp/* /var/cache/* /usr/share/doc/* /usr/share/man/* /var/lib/apt/li
 
 USER $USER:docker
 ENTRYPOINT /home/start.sh
+WORKDIR '/home/docker'

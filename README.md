@@ -21,6 +21,7 @@ docker build -t ubuntu18.04-anaconda3/cuda-11.0:latest ubuntu-anaconda
 
 # or u can specify the username & password if u want
 docker build -t ubuntu18.04-anaconda3/cuda-11.0:latest \
+--build-arg DOCKER_BASE="nvidia/cuda:11.0.3-cudnn8-devel-ubuntu20.04" \
 --build-arg USER="dev" \
 --build-arg PASSWD="123456" \
 ubuntu-anaconda
@@ -77,7 +78,7 @@ The password for the user `docker` is also `docker`.
 And user `docker` have been added into the root group which means you can install any softwares with `sudo` as the command-prefix.
 
 ## Future Works
-- [ ] cd $HOME when launch a new container.
+- [x] cd $HOME when launch a new container.
 - [ ] use a docker volume to manage the access to the directory /data
 
 ## References

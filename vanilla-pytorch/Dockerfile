@@ -1,5 +1,6 @@
 # basic image
-FROM ubuntu18.04-anaconda3/cuda-11.0:latest
+ARG DOCKER_BASE="ubuntu18.04-anaconda3/cuda-11.0:latest"
+FROM $DOCKER_BASE
 
 ARG DEBIAN_FRONTEND noninteractive
 ARG ENV_NAME="py37"
