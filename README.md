@@ -75,6 +75,9 @@ The password for the user `docker` is also `docker`.
 
 And user `docker` have been added into the root group which means you can install any softwares with `sudo` as the command-prefix.
 
+## Future Works
+- [ ] cd $HOME when launch a new container.
+- [ ] use a docker volume to manage the access to the directory /data
 
 ## References
 * https://github.com/boxboat/fixuid
