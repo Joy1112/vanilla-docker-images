@@ -47,7 +47,7 @@ RUN apt-get update --fix-missing && apt-get upgrade -y &&  \
 # add new sudo user named docker with 'docker' as its password
 RUN addgroup --gid 1111 docker && \
     adduser --uid 1111 --ingroup docker --home $USER_HOME --shell /bin/bash --disabled-password --gecos "" $USER && \
-    adduser $USER sudo && \
+    echo '%docker    ALL=(ALL:ALL) ALL' >> /etc/sudoers && \
     echo $USER:$PASSWD | chpasswd
 
 # fixuid setup
@@ -63,9 +63,7 @@ RUN GROUP=docker && \
 RUN wget -q -P /tmp https://mirrors.tuna.tsinghua.edu.cn/anaconda/archive/Anaconda3-2021.11-Linux-x86_64.sh && \
     mv /tmp/Anaconda3-*.sh /tmp/anaconda.sh && \
     /bin/bash /tmp/anaconda.sh -b -p /usr/local/anaconda3 && \
-    groupadd anaconda && \
-    usermod -a -G anaconda $USER && \
-    chgrp -R anaconda /usr/local/anaconda3 && \
+    chgrp -R docker /usr/local/anaconda3 && \
     chmod 777 -R /usr/local/anaconda3 && chmod g+s /usr/local/anaconda3 && chmod g+s `find /usr/local/anaconda3/ -type d`
 ENV PATH /usr/local/anaconda3/bin:$PATH
 RUN mkdir $USER_HOME/.pip && \

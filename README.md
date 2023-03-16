@@ -79,6 +79,7 @@ And user `docker` have been added into the root group which means you can instal
 
 ## Future Works
 - [x] cd $HOME when launch a new container.
+- [x] fix bug: deal with the losing of other groups when using fixuid. (which is discussed in [#30](https://github.com/boxboat/fixuid/issues/30))
 - [ ] use a docker volume to manage the access to the directory /data
 
 ## References
