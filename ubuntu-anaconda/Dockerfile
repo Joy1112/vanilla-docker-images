@@ -11,26 +11,30 @@ ARG DEBIAN_FRONTEND=noninteractive
 ARG USER="docker"
 ARG PASSWD="docker"
 ARG USER_HOME="/home/"$USER
+
+# jammy for 22.04, focal for 20.04, bionic for 18.04
+ARG SYSTEM="focal"
 EXPOSE 22
 
 # copy files
 COPY fixuid-*-linux-amd64.tar.gz /tmp/
+COPY anaconda.sh /tmp/
 
 # install ca-certificates & update sources.list
 RUN apt-get update --fix-missing && \
     apt-get install -y --no-install-recommends apt-utils ca-certificates && \
     mv /etc/apt/sources.list /etc/apt/sources.list.bak && \
-    echo -e "deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ bionic main restricted universe multiverse\n"\
-"# deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ bionic main restricted universe multiverse\n"\
-"deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ bionic-updates main restricted universe multiverse\n"\
-"# deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ bionic-updates main restricted universe multiverse\n"\
-"deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ bionic-backports main restricted universe multiverse\n"\
-"# deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ bionic-backports main restricted universe multiverse\n"\
-"deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ bionic-security main restricted universe multiverse\n"\
-"# deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ bionic-security main restricted universe multiverse\n"\
+    echo -e "deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ $SYSTEM main restricted universe multiverse\n"\
+"# deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ $SYSTEM main restricted universe multiverse\n"\
+"deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ $SYSTEM-updates main restricted universe multiverse\n"\
+"# deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ $SYSTEM-updates main restricted universe multiverse\n"\
+"deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ $SYSTEM-backports main restricted universe multiverse\n"\
+"# deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ $SYSTEM-backports main restricted universe multiverse\n"\
+"deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ $SYSTEM-security main restricted universe multiverse\n"\
+"# deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ $SYSTEM-security main restricted universe multiverse\n"\
 "\n"\
-"# deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ bionic-proposed main restricted universe multiverse\n"\
-"# deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ bionic-proposed main restricted universe multiverse" > /etc/apt/sources.list
+"# deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ $SYSTEM-proposed main restricted universe multiverse\n"\
+"# deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ $SYSTEM-proposed main restricted universe multiverse" > /etc/apt/sources.list
 
 # install basic softwares
 RUN apt-get update --fix-missing && apt-get upgrade -y &&  \
@@ -60,11 +64,15 @@ RUN GROUP=docker && \
     printf "user: $USER\ngroup: $GROUP\npaths:\n  - $USER_HOME\n  - $USER_HOME/.ssh" > /etc/fixuid/config.yml
 
 # install anaconda3 & change conda/pip sources
-RUN wget -q -P /tmp https://mirrors.tuna.tsinghua.edu.cn/anaconda/archive/Anaconda3-2021.11-Linux-x86_64.sh && \
-    mv /tmp/Anaconda3-*.sh /tmp/anaconda.sh && \
-    /bin/bash /tmp/anaconda.sh -b -p /usr/local/anaconda3 && \
-    chgrp -R docker /usr/local/anaconda3 && \
-    chmod 777 -R /usr/local/anaconda3 && chmod g+s /usr/local/anaconda3 && chmod g+s `find /usr/local/anaconda3/ -type d`
+# RUN curl -s -o /tmp/anaconda.sh https://mirrors.tuna.tsinghua.edu.cn/anaconda/archive/Anaconda3-2021.11-Linux-x86_64.sh
+RUN /bin/bash /tmp/anaconda.sh -b -p /usr/local/anaconda3
+RUN chgrp -R docker /usr/local/anaconda3
+RUN chmod 777 -R /usr/local/anaconda3 && chmod g+s /usr/local/anaconda3 && chmod g+s `find /usr/local/anaconda3/ -type d`
+# RUN wget -q -P /tmp https://mirrors.tuna.tsinghua.edu.cn/anaconda/archive/Anaconda3-2021.11-Linux-x86_64.sh && \
+#     mv /tmp/Anaconda3-*.sh /tmp/anaconda.sh && \
+#     /bin/bash /tmp/anaconda.sh -b -p /usr/local/anaconda3 && \
+#     chgrp -R docker /usr/local/anaconda3 && \
+#     chmod 777 -R /usr/local/anaconda3 && chmod g+s /usr/local/anaconda3 && chmod g+s `find /usr/local/anaconda3/ -type d`
 ENV PATH /usr/local/anaconda3/bin:$PATH
 RUN mkdir $USER_HOME/.pip && \
     echo -e "[global]\n"\
